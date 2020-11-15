@@ -1,7 +1,7 @@
 <template>
   <b-menu>
     <b-menu-list>
-      <b-menu-item icon="domain" label="Здания"></b-menu-item>
+      <b-menu-item icon="domain" label="Здания" :active="true"></b-menu-item>
     </b-menu-list>
   </b-menu>
 </template>
@@ -10,11 +10,7 @@
 export default {};
 </script>
 
-<style lang="scss" scoped>
-/deep/ {
-  @import "~bulma"; 
-  @import "~buefy/src/scss/buefy";
-
-  $menu-item-active-background-color: $blue;
-}
+<style lang="scss">
+@import '~bulma';
+$menu-item-active-background-color: $blue;
 </style>

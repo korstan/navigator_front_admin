@@ -1,7 +1,8 @@
 <template>
   <div>
     <h1 class="title">{{ title }}</h1>
-    <b-menu-list>
+    <b-loading v-model="isLoading"></b-loading>
+    <b-menu-list v-if="!isLoading">
       <LevelMenuItem v-for="location in locations" :key="location.id" v-bind="location" />
       <AddNewMenuItem label="этаж"/>
     </b-menu-list>
@@ -18,6 +19,7 @@ export default {
   components: { AddNewMenuItem, LevelMenuItem },
   data() {
     return {
+      isLoading: false,
       locations: [],
     }
   },
@@ -25,7 +27,9 @@ export default {
     title: String,
   },
   created: async function() {
+    this.isLoading = true;
     this.locations = await coreApi.getLevels(this.$route.params.id);
+    this.isLoading = false;
   },
 };
 </script>

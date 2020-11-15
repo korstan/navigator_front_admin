@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="tile app-child is-ancestor">
-      <div class="tile side is-vertical is-2">
+      <div class="tile is-vertical is-2">
         <SideMenu />
       </div>
       <div class="tile app-child main is-vertical">
@@ -45,10 +45,5 @@ html, body {
 
 .app-child {
   padding: 24px;
-}
-
-.side {
-  background-color: lightgray;
-  
 }
 </style>
