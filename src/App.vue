@@ -1,28 +1,54 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="tile app-child is-ancestor">
+      <div class="tile side is-vertical is-2">
+        <SideMenu />
+      </div>
+      <div class="tile app-child main is-vertical">
+        <router-view />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SideMenu from '@/components/SideMenu';
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  components: {SideMenu},
+};
 </script>
 
 <style>
+@import "https://cdn.materialdesignicons.com/5.3.45/css/materialdesignicons.min.css";
+
+html, body {
+   height: 100%;
+   width: 100%;
+   margin: 0;
+   padding: 0;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  height: 100%;
+}
+
+.tile.is-ancestor {
+  height: 100%;
+}
+
+.app-child {
+  padding: 24px;
+}
+
+.side {
+  background-color: lightgray;
+  
 }
 </style>
