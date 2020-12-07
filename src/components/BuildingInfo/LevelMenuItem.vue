@@ -12,16 +12,14 @@
       :key="location.id"
       v-bind="location"
     />
-    <AddNewMenuItem label="локацию" />
   </b-menu-item>
 </template>
 
 <script>
-import AddNewMenuItem from '@/components/AddNewMenuItem';
 import LocationMenuItem from '@/components/BuildingInfo/LocationMenuItem';
 
 export default {
-  components: { AddNewMenuItem, LocationMenuItem },
+  components: { LocationMenuItem },
   data() {
     return {
       isActive: false,
