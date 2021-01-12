@@ -2,12 +2,12 @@
   <b-modal v-model="visible" @close="close()">
     <div class="modal-card" style="width: auto">
       <header class="modal-card-head">
-        <p class="modal-card-title">Добавить здание</p>
+        <p class="modal-card-title">Изменить здание</p>
         <button type="button" class="delete" @click="close()" />
       </header>
       <section class="modal-card-body">
         <b-field label="Название">
-          <b-input v-model="title" placeholder="Название здания" required>
+          <b-input v-model="building.title" placeholder="Название здания" required>
           </b-input>
         </b-field>
       </section>
@@ -15,7 +15,7 @@
         <button class="button" type="button" @click="close()">
           Отмена
         </button>
-        <button class="button is-blue" @click="submit()">
+        <button class="button" @click="$emit('submit', building)">
           Сохранить
         </button>
       </footer>
@@ -27,31 +27,22 @@
 
 
 export default {
-  props: ['visible'],
+  props: ['visible', 'initialBuilding'],
   data() {
     return {
-      title: '',
+      building: {
+        id: this.initialBuilding.id,
+        title: this.initialBuilding.title
+      }
     };
   },
   methods: {
     close: function() {
       this.$emit('close');
-      this.resetForm();
-    },
-    resetForm: function() {
-      this.title = '';
-    },
-    submit: function() {
-      this.$emit('submit', { title: this.title });
-      this.resetForm();
     },
   },
 };
 </script>
 
 <style>
-  is-blue {
-    background-color: #3273dc;
-    color: #fff;
-  }
 </style>

@@ -1,17 +1,37 @@
 <template>
   <div>
     <h1 class="title">Здания</h1>
-    <b-menu>
+    <b-menu :activable="false">
       <b-loading v-model="isLoading"></b-loading>
       <b-menu-list v-if="!isLoading">
-        <BuildingItem v-for="building in buildings" :key="building.id" v-bind="building"></BuildingItem>
-        <AddNewMenuItem label="здание" @click="showModal" />
+        <BuildingItem 
+          v-for="building in buildings" 
+          :key="building.id" 
+          v-bind="building"
+          @edit="onEdit"
+          @remove="onRemove"
+        >
+        </BuildingItem>
+        <AddNewMenuItem label="здание" @click="showModal('new')" />
       </b-menu-list>
     </b-menu>
     <NewBuildingModal 
-      :visible="isModalVisible"
+      :visible="visibleModal === 'new'"
       @close="hideModal"
       @submit="submitNewBuilding"
+    />
+    <ConfirmRemoveModal
+      :visible="visibleModal === 'remove'"
+      :title="selectedBuilding.title"
+      @close="hideModal"
+      @remove="removeSelectedBuilding"
+    />
+    <EditBuildingModal
+      v-if="visibleModal === 'edit'"
+      :visible="visibleModal === 'edit'"
+      :initialBuilding="selectedBuilding"
+      @submit="updateBuilding"
+      @close="hideModal"
     />
   </div>
 </template>
@@ -20,6 +40,8 @@
 import AddNewMenuItem from '@/components/AddNewMenuItem';
 import BuildingItem from '@/components/AllBuildings/BuildingItem';
 import NewBuildingModal from '@/components/AllBuildings/NewBuildingModal';
+import ConfirmRemoveModal from '@/components/ConfirmRemoveModal';
+import EditBuildingModal from '@/components/AllBuildings/EditBuildingModal';
 
 import coreApi from '@/services/api/core';
 import adminApi from '@/services/api/admin';
@@ -28,21 +50,27 @@ export default {
   components: {
     AddNewMenuItem,
     BuildingItem,
-    NewBuildingModal
+    NewBuildingModal,
+    ConfirmRemoveModal,
+    EditBuildingModal,
   },
   data() {
     return {
       isLoading: false,
-      isModalVisible: false,
+      visibleModal: undefined,
       buildings: [],
+      selectedBuilding: {
+        id: undefined,
+        title: undefined,
+      }
     }
   },
   methods: {
-    showModal: function () {
-      this.isModalVisible = true;
+    showModal: function (modalName) {
+      this.visibleModal = modalName;
     },
     hideModal: function () {
-      this.isModalVisible = false;
+      this.visibleModal = undefined;
     },
     submitNewBuilding: async function(newBuilding) {
       const response = await adminApi.createBuilding(newBuilding);
@@ -50,6 +78,25 @@ export default {
         this.buildings.push(response);
       }
       this.hideModal();
+    },
+    setSelectedBuilding(id) {
+      this.selectedBuilding = this.buildings.find(b => b.id === id);
+    },
+    onEdit(id) {
+      this.setSelectedBuilding(id);
+      this.showModal('edit');
+    },
+    onRemove(id) {
+      this.setSelectedBuilding(id);
+      this.showModal('remove');
+    },
+    updateBuilding(updatedBuilding) {
+      //TODO: PATCH building
+    },
+    removeSelectedBuilding() {
+      if(this.selectedBuilding.id) {
+        // TODO: DELETE endpoint
+      }
     }
   },
   created: async function() {
