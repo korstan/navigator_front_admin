@@ -11,6 +11,8 @@
       v-for="location in locations"
       :key="location.id"
       v-bind="location"
+      @edit="(id)=>$emit('edit', {id, level})"
+      @remove="(id)=>$emit('remove', {id, level})"
     />
   </b-menu-item>
 </template>

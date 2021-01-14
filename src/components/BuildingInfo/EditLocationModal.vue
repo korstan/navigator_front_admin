@@ -29,13 +29,7 @@
           Отмена
         </button>
         <button
-          class="button is-danger"
-          @click="remove()"
-        >
-          Удалить
-        </button>
-        <button
-          class="button is-primary"
+          class="button"
           @click="submit()"
         >
           Сохранить
@@ -47,13 +41,14 @@
 
 <script>
 export default {
-  props: ['visible'],
+  props: ['visible', 'initialLocation'],
   data() {
     return {
-      title: '',
-      level: 1,
-      x: 0,
-      y: 0,
+      id: this.initialLocation.id,
+      title: this.initialLocation.title,
+      level: this.initialLocation.level,
+      x: this.initialLocation.x,
+      y: this.initialLocation.y,
     };
   },
   methods: {
@@ -62,6 +57,7 @@ export default {
       this.resetForm();
     },
     resetForm: function() {
+      this.id = undefined,
       this.title = '';
       this.level = 1;
       this.x = 0;
@@ -69,6 +65,7 @@ export default {
     },
     submit: function() {
       this.$emit('submit', {
+        id: this.id,
         title: this.title,
         level: this.level,
         x: this.x,

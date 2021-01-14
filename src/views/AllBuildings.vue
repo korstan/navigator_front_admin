@@ -4,9 +4,9 @@
     <b-menu :activable="false">
       <b-loading v-model="isLoading"></b-loading>
       <b-menu-list v-if="!isLoading">
-        <BuildingItem 
-          v-for="building in buildings" 
-          :key="building.id" 
+        <BuildingItem
+          v-for="building in buildings"
+          :key="building.id"
           v-bind="building"
           @edit="onEdit"
           @remove="onRemove"
@@ -15,7 +15,7 @@
         <AddNewMenuItem label="здание" @click="showModal('new')" />
       </b-menu-list>
     </b-menu>
-    <NewBuildingModal 
+    <NewBuildingModal
       :visible="visibleModal === 'new'"
       @close="hideModal"
       @submit="submitNewBuilding"
@@ -90,12 +90,18 @@ export default {
       this.setSelectedBuilding(id);
       this.showModal('remove');
     },
-    updateBuilding(updatedBuilding) {
-      //TODO: PATCH building
+    updateBuilding: async function({id, title}) {
+      const response = await adminApi.updateBuilding({id, title});
+      if(!response.error) {
+        this.buildings = this.buildings.map(b=>b.id === response.id ? response : b);
+        this.hideModal();
+      }
     },
-    removeSelectedBuilding() {
-      if(this.selectedBuilding.id) {
-        // TODO: DELETE endpoint
+    removeSelectedBuilding: async function() {
+      const response = await adminApi.removeBuilding(this.selectedBuilding.id);
+      if(!response.error) {
+        this.buildings = this.buildings.filter(b => b.id != response.id);
+        this.hideModal();
       }
     }
   },
