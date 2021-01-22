@@ -82,6 +82,8 @@ export default {
         title: foundLocation.title,
         x: foundLocation.points.x1,
         y: foundLocation.points.y1,
+        x_entry: foundLocation.entryPoints.x,
+        y_entry: foundLocation.entryPoints.y,
       }
     },
     onEdit(obj) {
@@ -118,6 +120,7 @@ export default {
         let mappedResponse = {
           id: response.id,
           points: { x1: response.x, y1: response.y},
+          entryPoints: { x: response.x_entry, y: response.y_entry },
           title: response.title
         }
 

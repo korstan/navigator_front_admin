@@ -23,6 +23,14 @@
         <b-field label="Y">
           <b-input v-model="y" placeholder="Координата Y" required> </b-input>
         </b-field>
+
+        <b-field label="Вход X">
+          <b-input v-model="x_entry" placeholder="Координата входа X"> </b-input>
+        </b-field>
+
+        <b-field label="Вход Y">
+          <b-input v-model="y_entry" placeholder="Координата входа Y"> </b-input>
+        </b-field>
       </section>
       <footer class="modal-card-foot">
         <button class="button" type="button" @click="close()">
@@ -49,6 +57,8 @@ export default {
       level: this.initialLocation.level,
       x: this.initialLocation.x,
       y: this.initialLocation.y,
+      x_entry: this.initialLocation.x_entry,
+      y_entry: this.initialLocation.y_entry
     };
   },
   methods: {
@@ -62,6 +72,8 @@ export default {
       this.level = 1;
       this.x = 0;
       this.y = 0;
+      this.x_entry = 0;
+      this.y_entry = 0;
     },
     submit: function() {
       this.$emit('submit', {
@@ -70,6 +82,8 @@ export default {
         level: this.level,
         x: this.x,
         y: this.y,
+        x_entry: this.x_entry,
+        y_entry: this.y_entry
       });
       this.resetForm();
     },
