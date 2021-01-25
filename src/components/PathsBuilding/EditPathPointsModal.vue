@@ -2,7 +2,7 @@
   <b-modal v-model="visible" @close="close()">
     <div class="modal-card" style="width: auto">
       <header class="modal-card-head">
-        <p class="modal-card-title">Изменить локацию</p>
+        <p class="modal-card-title">Изменить маршрутную точку</p>
         <button type="button" class="delete" @click="close()" />
       </header>
       <section class="modal-card-body">
@@ -24,25 +24,20 @@
           <b-input v-model="y" placeholder="Координата Y" required> </b-input>
         </b-field>
 
-        <b-field label="Вход X">
-          <b-input v-model="x_entry" placeholder="Координата входа X"> </b-input>
-        </b-field>
-
-        <b-field label="Вход Y">
-          <b-input v-model="y_entry" placeholder="Координата входа Y"> </b-input>
-        </b-field>
-
-        <b-field label="Связанная точка маршрута">
+        <b-field label="Связи">
           <b-loading v-model="isLoading"></b-loading>
-          <b-select v-if="!isLoading" v-model="pathPointId" placeholder="Имя связанной точки">
-            <option
-              v-for="point in pathPoints"
-              :value="point.id"
-              :key="point.id">
-              {{ point.title }}
-            </option>
-          </b-select>
+          <div v-if="!isLoading" class="block">
+            <b-checkbox
+              v-for="link in currentLevelPoints"
+              :key="link.id"
+              v-model="checkboxLinks"
+              :native-value="link.id"
+            >
+              {{link.title}}
+            </b-checkbox>
+          </div>
         </b-field>
+
       </section>
       <footer class="modal-card-foot">
         <button class="button" type="button" @click="close()">
@@ -63,26 +58,27 @@
 import coreApi from '@/services/api/core';
 
 export default {
-  props: ['visible', 'initialLocation', 'buildingId'],
+  props: ['visible', 'initialPoint', 'buildingId'],
   data() {
     return {
-      id: this.initialLocation.id,
-      title: this.initialLocation.title,
-      level: this.initialLocation.level,
-      x: this.initialLocation.x,
-      y: this.initialLocation.y,
-      x_entry: this.initialLocation.x_entry,
-      y_entry: this.initialLocation.y_entry,
-      pathPointId: this.initialLocation.pathPointId,
+      id: this.initialPoint.id,
+      title: this.initialPoint.title,
+      level: this.initialPoint.level,
+      x: this.initialPoint.x,
+      y: this.initialPoint.y,
       isLoading: false,
-      pathPoints: [],
+      checkboxLinks: [],
+      currentLevelPoints: []
     };
   },
+
   created: async function() {
     this.isLoading = true;
-    this.pathPoints = await coreApi.getPathPoints(this.buildingId, this.initialLocation.level);
+    this.currentLevelPoints = (await coreApi.getPathPoints(this.buildingId, this.initialPoint.level)).filter(lp=>lp.id != this.initialPoint.id);
+    this.checkboxLinks = (await coreApi.getPathPointLinks(this.initialPoint.id));
     this.isLoading = false;
   },
+
   methods: {
     close: function() {
       this.$emit('close');
@@ -94,9 +90,6 @@ export default {
       this.level = 1;
       this.x = 0;
       this.y = 0;
-      this.x_entry = 0;
-      this.y_entry = 0;
-      this.pathPointId = null;
     },
     submit: function() {
       this.$emit('submit', {
@@ -105,9 +98,7 @@ export default {
         level: this.level,
         x: this.x,
         y: this.y,
-        x_entry: this.x_entry,
-        y_entry: this.y_entry,
-        pathPointId: this.pathPointId
+        links: this.checkboxLinks
       });
       this.resetForm();
     },
@@ -115,4 +106,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+  .block {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

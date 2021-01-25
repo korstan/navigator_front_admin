@@ -1,14 +1,15 @@
 <template>
   <b-menu-item
-    @click.self="route"
+    @click.native="$emit('route')"
   >
-    <template slot="label" >
+    <template slot="label">
       {{title}}
       <b-dropdown
         aria-role="list"
         class="is-pulled-right"
         position="is-top-left"
         :triggers="['hover']"
+        v-if="!hideActions"
       >
         <b-icon icon="dots-vertical" slot="trigger"></b-icon>
         <b-dropdown-item @click="$emit('edit', id)" aria-role="listitem">Редактировать</b-dropdown-item>
@@ -24,11 +25,7 @@ export default {
   props: {
     id: String,
     title: String,
-  },
-  methods: {
-    route() {
-      this.$router.push(`/building/${this.id}?title=${this.title}`)
-    },
+    hideActions: Boolean
   },
 };
 </script>

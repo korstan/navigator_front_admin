@@ -21,7 +21,6 @@ export default {
   props: {
     id: String,
     title: String,
-    points: Object,
   },
 }
 </script>

@@ -30,6 +30,7 @@
       v-if="visibleModal === 'edit'"
       :visible="visibleModal === 'edit'"
       :initialLocation="selectedLocation"
+      :buildingId="$route.params.id"
       @submit="updateLocation"
       @close="hideModal"
     />
@@ -54,6 +55,9 @@ export default {
     NewLocationModal,
     ConfirmRemoveModal,
     EditLocationModal
+  },
+  props: {
+    title: String,
   },
   data() {
     return {
@@ -84,6 +88,7 @@ export default {
         y: foundLocation.points.y1,
         x_entry: foundLocation.entryPoints.x,
         y_entry: foundLocation.entryPoints.y,
+        pathPointId: foundLocation.pathPointId,
       }
     },
     onEdit(obj) {
@@ -121,7 +126,8 @@ export default {
           id: response.id,
           points: { x1: response.x, y1: response.y},
           entryPoints: { x: response.x_entry, y: response.y_entry },
-          title: response.title
+          title: response.title,
+          pathPointId: response.pathPointId
         }
 
         this.locations = this.locations
@@ -149,9 +155,6 @@ export default {
         this.hideModal();
       }
     },
-  },
-  props: {
-    title: String,
   },
   created: async function() {
     this.isLoading = true;

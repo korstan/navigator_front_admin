@@ -8,6 +8,7 @@
           v-for="building in buildings"
           :key="building.id"
           v-bind="building"
+          @route="$router.push(`/building/${building.id}?title=${building.title}`)"
           @edit="onEdit"
           @remove="onRemove"
         >

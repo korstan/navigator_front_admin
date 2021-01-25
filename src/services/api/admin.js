@@ -23,4 +23,12 @@ export default {
     adminApi.put(`location/${location.id}/edit`, location).then((response) => response.data),
   removeLocation: (id) =>
     adminApi.delete(`location/${id}/remove`).then((response) => response.data),
+
+  // pathPoint
+  createPathPoint: (pathPoint) =>
+    adminApi.post('pathPoints/new', pathPoint).then((response) => response.data),
+  updatePathPoint: (pathPoint) =>
+    adminApi.put(`pathPoints/${pathPoint.id}/edit`, pathPoint).then((response) => response.data),
+  removePathPoint: (id) =>
+    adminApi.delete(`pathPoints/${id}/remove`).then((response) => response.data),
 };
