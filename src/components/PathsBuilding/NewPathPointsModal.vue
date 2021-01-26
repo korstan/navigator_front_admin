@@ -24,6 +24,14 @@
           <b-input v-model="y" placeholder="Координата Y" required> </b-input>
         </b-field>
 
+        <b-field label="Текст для озвучки">
+          <b-input v-model="textToSpeech" placeholder="Текст для озвучки маршрута"> </b-input>
+        </b-field>
+
+        <b-field label="Лестница?">
+          <b-checkbox v-model="isStairs"></b-checkbox>
+        </b-field>
+
       </section>
       <footer class="modal-card-foot">
         <button class="button" type="button" @click="close()">
@@ -49,6 +57,8 @@ export default {
       level: 1,
       x: 0,
       y: 0,
+      textToSpeech: '',
+      isStairs: false,
     };
   },
   methods: {
@@ -61,6 +71,8 @@ export default {
       this.level = 1;
       this.x = 0;
       this.y = 0;
+      this.textToSpeech = '';
+      this.isStairs = false;
     },
     submit: function() {
       this.$emit('submit', {
@@ -68,6 +80,8 @@ export default {
         level: this.level,
         x: this.x,
         y: this.y,
+        textToSpeech: this.textToSpeech,
+        isStairs: this.isStairs,
       });
       this.resetForm();
     },

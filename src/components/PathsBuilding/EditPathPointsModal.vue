@@ -24,6 +24,14 @@
           <b-input v-model="y" placeholder="Координата Y" required> </b-input>
         </b-field>
 
+        <b-field label="Текст для озвучки">
+          <b-input v-model="textToSpeech" placeholder="Текст для озвучки маршрута"> </b-input>
+        </b-field>
+
+        <b-field label="Лестница?">
+          <b-checkbox v-model="isStairs"></b-checkbox>
+        </b-field>
+
         <b-field label="Связи">
           <b-loading v-model="isLoading"></b-loading>
           <div v-if="!isLoading" class="block">
@@ -66,6 +74,8 @@ export default {
       level: this.initialPoint.level,
       x: this.initialPoint.x,
       y: this.initialPoint.y,
+      textToSpeech: this.initialPoint.textToSpeech,
+      isStairs: this.initialPoint.isStairs,
       isLoading: false,
       checkboxLinks: [],
       currentLevelPoints: []
@@ -90,6 +100,8 @@ export default {
       this.level = 1;
       this.x = 0;
       this.y = 0;
+      this.textToSpeech = '';
+      this.isStairs = false;
     },
     submit: function() {
       this.$emit('submit', {
@@ -98,6 +110,8 @@ export default {
         level: this.level,
         x: this.x,
         y: this.y,
+        textToSpeech: this.textToSpeech,
+        isStairs: this.isStairs,
         links: this.checkboxLinks
       });
       this.resetForm();

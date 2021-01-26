@@ -98,6 +98,8 @@ export default {
         title: foundPoint.title,
         x: foundPoint.x,
         y: foundPoint.y,
+        textToSpeech: foundPoint.textToSpeech,
+        isStairs: foundPoint.isStairs,
       }
     },
     onEdit(obj) {
