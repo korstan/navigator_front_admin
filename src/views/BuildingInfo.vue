@@ -34,6 +34,7 @@
       @submit="updateLocation"
       @close="hideModal"
     />
+    <Map :building-id="this.buildingId" :lev="currentLevel"></Map>
   </div>
 </template>
 
@@ -43,13 +44,16 @@ import LevelMenuItem from '@/components/BuildingInfo/LevelMenuItem';
 import NewLocationModal from '@/components/BuildingInfo/NewLocationModal';
 import ConfirmRemoveModal from '@/components/ConfirmRemoveModal';
 import EditLocationModal from '@/components/BuildingInfo/EditLocationModal';
+import Map from '@/components/Map';
+
 
 import coreApi from '@/services/api/core';
 import adminApi from '@/services/api/admin';
 
 export default {
   name: 'BuildingInfo',
-  components: { 
+  components: {
+    Map,
     AddNewMenuItem, 
     LevelMenuItem, 
     NewLocationModal,
@@ -58,6 +62,7 @@ export default {
   },
   props: {
     title: String,
+    buildingId: String
   },
   data() {
     return {
@@ -66,6 +71,7 @@ export default {
       locations: [],
       isModalVisible: false,
       selectedLocation: {},
+      currentLevel: 1,
     };
   },
   methods: {

@@ -12,7 +12,7 @@ export default [
     path: '/building/:id',
     component: BuildingInfo,
     props(route) {
-      return { title: route.query.title };
+      return { title: route.query.title, buildingId: route.params.id };
     },
   },
   { 
