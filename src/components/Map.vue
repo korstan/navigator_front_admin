@@ -1,12 +1,22 @@
 <template>
-  <div id="map" ref="map"></div>
+<div>
+  <div id="map" ref="map">
+  </div>
+  <MarkerPopup :visible="this.newModalVisible" :x="this.newModalX" :y="this.newModalY">
+    <b-button type="is-text">Создать новую локацию</b-button>
+  </MarkerPopup>
+  <MarkerPopup :visible="this.editModalVisible" :x="this.editModalX" :y="this.editModalY">
+    <b-button type="is-text">Редактировать</b-button>
+    <b-button type="is-text">Удалить</b-button>
+  </MarkerPopup>
+</div>
 </template>
 
 <script>
 import L from 'leaflet/dist/leaflet';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
-
+import MarkerPopup from '@/components/MarkerPopup';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -18,6 +28,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export default {
   name: 'Map',
+  components: {MarkerPopup},
   props: {
     buildingId: String,
     lev: String,
@@ -34,7 +45,16 @@ export default {
       currentLevelObject: null,
       sizeMultiplier: 5,
 
-      currentMarkersObjects: []
+      currentMarkersObjects: [],
+      newMarkerObject: undefined,
+
+      newModalVisible: false,
+      newModalX: 0,
+      newModalY: 0,
+
+      editModalVisible: false,
+      editModalX: 0,
+      editModalY: 0,
     }
   },
   methods: {
@@ -96,7 +116,19 @@ export default {
         lat: parseFloat((leafletMapHeight * percentByHeight * -1).toFixed(4))
       }
     },
-    addMarker(leafletPoint) {
+    addNewMarker(leafletPoint) {
+      const marker = L.marker(leafletPoint, DefaultIcon)
+      marker.addTo(this.map);
+      this.newModalVisible = false;
+      marker.on('click',(e)=> {
+        this.newModalVisible = !this.newModalVisible;
+        this.newModalX = e.originalEvent.pageX;
+        this.newModalY = e.originalEvent.pageY;
+      });
+      this.newMarkerObject && this.newMarkerObject.remove();
+      this.newMarkerObject = marker;
+    },
+    addExistingMarker(leafletPoint) {
       const marker = L.marker(leafletPoint, DefaultIcon)
       marker.addTo(this.map)
       this.currentMarkersObjects.push(marker)
@@ -115,6 +147,10 @@ export default {
         }
       }
     },
+    hideAllMarkerModals() {
+      this.editModalVisible = false;
+      this.newModalVisible = false;
+    }
   },
   async created() {
     const apiUrl = 'http://194.87.232.192/navigator/api/';
@@ -143,11 +179,14 @@ export default {
 
 
     this.map.on('click', (e) => {
-      console.log(e.latlng)
-      const percents = this.convertLatLngToPercents(e.latlng.lat, e.latlng.lng)
-      console.log(percents);
-      console.log(this.convertPercentsToLatLng(percents.percentByWidth, percents.percentByHeight))
+      this.addNewMarker([e.latlng.lat, e.latlng.lng])
+      // console.log(e.latlng)
+      // const pixels = this.convertLeafletPointPixels(e.latlng.lng, e.latlng.lat)
+      // console.log(pixels);
+      // console.log(this.convertPixelToLeafletPoint(percents.percentByWidth, percents.percentByHeight))
     });
+
+    this.map.on('movestart', (e) => { this.hideAllMarkerModals() });
   },
   computed: {
     level: function () {
