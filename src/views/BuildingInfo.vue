@@ -2,7 +2,15 @@
   <div>
     <h1 class="title">{{ title }}</h1>
     <b-loading v-model="isLoading"></b-loading>
-    <b-menu :activable="false">
+    <b-select v-if="!isLoading" v-model="currentLevel" placeholder="Выберите этаж">
+      <option
+          v-for="location in locations"
+          :value="location.level"
+          :key="location.level">
+          {{ `${location.level} этаж` }}
+      </option>
+    </b-select>
+    <!-- <b-menu :activable="false">
       <b-menu-list v-if="!isLoading">
         <LevelMenuItem
           v-for="location in locations"
@@ -13,7 +21,7 @@
         />
         <AddNewMenuItem label="локацию" @click="showModal('new')" />
       </b-menu-list>
-    </b-menu>
+    </b-menu> -->
 
     <NewLocationModal
       :visible="visibleModal === 'new'"
