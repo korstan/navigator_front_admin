@@ -46,4 +46,8 @@ html, body {
 .app-child {
   padding: 24px;
 }
+
+.input {
+  text-align: center;
+}
 </style>

@@ -49,13 +49,13 @@
 
 <script>
 export default {
-  props: ['visible'],
+  props: ['visible', 'x', 'y'],
   data() {
     return {
       title: '',
       level: 1,
-      x: 0,
-      y: 0,
+      x: this.x || 0,
+      y: this.y || 0,
       x_entry: null,
       y_entry: null
     };

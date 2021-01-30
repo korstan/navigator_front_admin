@@ -3,7 +3,7 @@
   <div id="map" ref="map">
   </div>
   <MarkerPopup :visible="this.newModalVisible" :x="this.newModalX" :y="this.newModalY">
-    <b-button type="is-text">Создать новую локацию</b-button>
+    <b-button @click="emitNewLocation" type="is-text">Создать новую локацию</b-button>
   </MarkerPopup>
   <MarkerPopup :visible="this.editModalVisible" :x="this.editModalX" :y="this.editModalY">
     <b-button type="is-text">Редактировать</b-button>
@@ -32,6 +32,7 @@ export default {
   props: {
     buildingId: String,
     lev: String,
+    locationsVisible: Boolean,
   },
   data() {
     return {
@@ -90,12 +91,12 @@ export default {
       return [parseInt(y) * this.sizeMultiplier / leafletDivider * -1,
         parseInt(x) * this.sizeMultiplier / leafletDivider];
     },
-    convertLeafletPointPixels(x, y) {
+    convertLeafletPointToPixels(x, y) {
 
       const leafletDivider = 8;
 
-      return [parseInt(y) * leafletDivider  / this.sizeMultiplier * -1,
-        parseInt(x) * leafletDivider / this.sizeMultiplier ];
+      return [ parseInt(x) * leafletDivider / this.sizeMultiplier, 
+        parseInt(y) * leafletDivider  / this.sizeMultiplier * -1];
     },
     convertLatLngToPercents(lat, lng) {
       const clickWidth = lng;
@@ -134,6 +135,7 @@ export default {
       this.currentMarkersObjects.push(marker)
     },
     removeAllMarkers() {
+      this.newMarkerObject && this.newMarkerObject.remove();
       for (const marker of this.currentMarkersObjects) {
         marker.remove(this.map)
       }
@@ -150,6 +152,12 @@ export default {
     hideAllMarkerModals() {
       this.editModalVisible = false;
       this.newModalVisible = false;
+    },
+
+    emitNewLocation() {
+      const { lat, lng } = this.newMarkerObject.getLatLng();
+      const [x, y] = (this.convertLeafletPointToPixels(lng, lat));
+      this.$emit('new', {x, y});
     }
   },
   async created() {
@@ -181,7 +189,7 @@ export default {
     this.map.on('click', (e) => {
       this.addNewMarker([e.latlng.lat, e.latlng.lng])
       // console.log(e.latlng)
-      // const pixels = this.convertLeafletPointPixels(e.latlng.lng, e.latlng.lat)
+      // const pixels = this.convertLeafletPointToPixels(e.latlng.lng, e.latlng.lat)
       // console.log(pixels);
       // console.log(this.convertPixelToLeafletPoint(percents.percentByWidth, percents.percentByHeight))
     });
@@ -200,6 +208,8 @@ export default {
     },
     lev: function () {
       this.updateMapImage();
+      this.removeAllMarkers();
+      this.hideAllMarkerModals();
     }
   }
 }

@@ -1,15 +1,17 @@
 <template>
   <div>
-    <h1 class="title">{{ title }}</h1>
     <b-loading v-model="isLoading"></b-loading>
-    <b-select v-if="!isLoading" v-model="currentLevel" placeholder="Выберите этаж">
-      <option
-          v-for="location in locations"
-          :value="location.level"
-          :key="location.level">
-          {{ `${location.level} этаж` }}
-      </option>
-    </b-select>
+    <div class="page-header">
+      <h1 class="title mr-4">{{ title }}</h1>
+      <b-select v-if="!isLoading" v-model="currentLevel" placeholder="Выберите этаж">
+        <option
+            v-for="location in locations"
+            :value="location.level"
+            :key="location.level">
+            {{ `${location.level} этаж` }}
+        </option>
+      </b-select>
+    </div>
     <!-- <b-menu :activable="false">
       <b-menu-list v-if="!isLoading">
         <LevelMenuItem
@@ -22,9 +24,20 @@
         <AddNewMenuItem label="локацию" @click="showModal('new')" />
       </b-menu-list>
     </b-menu> -->
+    <b-checkbox v-model="locationsVisible" type="is-info" class="is-pulled-left mb-3">
+      Показать существующие локации
+    </b-checkbox>
+    <Map 
+      :locationsVisible="this.locationsVisible" 
+      :building-id="this.buildingId" 
+      :lev="currentLevel"
+      @new="showNewModal"
+    ></Map>
 
     <NewLocationModal
       :visible="visibleModal === 'new'"
+      :x="newLocationPoints.x"
+      :y="newLocationPoints.y"
       @close="hideModal"
       @submit="submitNewLocation"
     />
@@ -42,7 +55,7 @@
       @submit="updateLocation"
       @close="hideModal"
     />
-    <Map :building-id="this.buildingId" :lev="currentLevel"></Map>
+    
   </div>
 </template>
 
@@ -79,7 +92,9 @@ export default {
       locations: [],
       isModalVisible: false,
       selectedLocation: {},
+      newLocationPoints: {},
       currentLevel: '1',
+      locationsVisible: false
     };
   },
   methods: {
@@ -88,6 +103,10 @@ export default {
     },
     hideModal: function () {
       this.visibleModal = undefined;
+    },
+    showNewModal: function(newLocationPoints) {
+      this.visibleModal = 'new';
+      this.newLocationPoints = newLocationPoints;
     },
     setSelectedLocation({id, level}) {
       let foundLocation = this.locations
@@ -178,4 +197,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+  .page-header {
+    display: flex;
+    justify-content: center;
+  }
+</style>
