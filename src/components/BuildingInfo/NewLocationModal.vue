@@ -32,12 +32,12 @@
           <b-input v-model="y_entry" placeholder="Координата входа Y"> </b-input>
         </b-field>
       </section>
-      <footer class="modal-card-foot">
+      <footer class="modal-card-foot is-flex is-justify-content-center">
         <button class="button" type="button" @click="close()">
           Отмена
         </button>
         <button
-          class="button is-primary"
+          class="button is-link"
           @click="submit()"
         >
           Сохранить
