@@ -79,7 +79,7 @@ export default {
       locations: [],
       isModalVisible: false,
       selectedLocation: {},
-      currentLevel: 1,
+      currentLevel: '1',
     };
   },
   methods: {

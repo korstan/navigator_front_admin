@@ -20,7 +20,7 @@ export default {
   name: 'Map',
   props: {
     buildingId: String,
-    lev: Number,
+    lev: String,
   },
   data() {
     return {
