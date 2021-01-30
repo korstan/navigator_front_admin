@@ -65,6 +65,18 @@ export default {
         this.currentLevelObject = level;
       }
     },
+    convertPixelToLeafletPoint(x, y) {
+      const leafletDivider = 8;
+      return [parseInt(y) * this.sizeMultiplier / leafletDivider * -1,
+        parseInt(x) * this.sizeMultiplier / leafletDivider];
+    },
+    convertLeafletPointPixels(x, y) {
+
+      const leafletDivider = 8;
+
+      return [parseInt(y) * leafletDivider  / this.sizeMultiplier * -1,
+        parseInt(x) * leafletDivider / this.sizeMultiplier ];
+    },
     convertLatLngToPercents(lat, lng) {
       const clickWidth = lng;
       const clickHeight = lat * -1;
