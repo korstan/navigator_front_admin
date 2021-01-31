@@ -109,6 +109,7 @@ export default {
       marker.addTo(this.map);
       this.newModalVisible = false;
       marker.on('click',(e)=> {
+        this.hideAllMarkerModals()
         this.newModalVisible = !this.newModalVisible;
         this.newModalX = e.originalEvent.pageX;
         this.newModalY = e.originalEvent.pageY;
@@ -122,6 +123,7 @@ export default {
       marker.addTo(this.map);
 
       marker.on('click',(e)=> {
+        this.hideAllMarkerModals()
         this.editModalVisible = !this.editModalVisible;
         this.editModalX = e.originalEvent.pageX;
         this.editModalY = e.originalEvent.pageY;
@@ -191,6 +193,7 @@ export default {
     this.$refs['map'].style.height = Math.round(window.innerHeight * 0.75) - 50 + 'px';
 
     this.map.on('click', (e) => {
+      this.hideAllMarkerModals()
       this.addNewMarker([e.latlng.lat, e.latlng.lng])
     });
     this.map.on('movestart', () => { this.hideAllMarkerModals() });
