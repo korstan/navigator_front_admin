@@ -1,21 +1,40 @@
 <template>
   <div>
-    <h1 class="title">{{ title }}</h1>
     <b-loading v-model="isLoading"></b-loading>
+    <div class="page-header">
+      <h1 class="title mr-4">{{ title }}</h1>
+      <b-select v-if="!isLoading" v-model="currentLevel" placeholder="Выберите этаж">
+        <option
+            v-for="pathPoint in pathPoints"
+            :value="pathPoint.level"
+            :key="pathPoint.level">
+          {{ `${pathPoint.level} этаж` }}
+        </option>
+      </b-select>
+    </div>
     
-    <b-menu :activable="false">
-      <b-menu-list v-if="!isLoading">
-        <LevelMenuItem
-          v-for="pathPoint in pathPoints"
-          :key="pathPoint.id"
-          :locations="pathPoint.points"
-          :level="pathPoint.level"
-          @edit="onEdit"
-          @remove="onRemove"
-        />
-        <AddNewMenuItem label="маршрутную точку" @click="showModal('new')" />
-      </b-menu-list>
-    </b-menu>
+<!--    <b-menu :activable="false">-->
+<!--      <b-menu-list v-if="!isLoading">-->
+<!--        <LevelMenuItem-->
+<!--          v-for="pathPoint in pathPoints"-->
+<!--          :key="pathPoint.id"-->
+<!--          :locations="pathPoint.points"-->
+<!--          :level="pathPoint.level"-->
+<!--          @edit="onEdit"-->
+<!--          @remove="onRemove"-->
+<!--        />-->
+<!--        <AddNewMenuItem label="маршрутную точку" @click="showModal('new')" />-->
+<!--      </b-menu-list>-->
+<!--    </b-menu>-->
+    <Map
+        :locationsVisible="this.locationsVisible"
+        :building-id="this.buildingId"
+        :lev="currentLevel"
+        :locs="pathPoints"
+        @new="showNewModal"
+        @edit="onEdit"
+        @remove="onRemove"
+    />
 
     <NewPathPointsModal
       :visible="visibleModal === 'new'"
@@ -40,21 +59,23 @@
 </template>
 
 <script>
-import AddNewMenuItem from '@/components/AddNewMenuItem';
-import LevelMenuItem from '@/components/BuildingInfo/LevelMenuItem';
+// import AddNewMenuItem from '@/components/AddNewMenuItem';
+// import LevelMenuItem from '@/components/BuildingInfo/LevelMenuItem';
 import NewPathPointsModal from '@/components/PathsBuilding/NewPathPointsModal';
 import ConfirmRemoveModal from '@/components/ConfirmRemoveModal';
 import EditPathPointsModal from '@/components/PathsBuilding/EditPathPointsModal';
 
 import coreApi from '@/services/api/core';
 import adminApi from '@/services/api/admin';
+import Map from "@/components/Map";
 
 export default {
   name: 'PathsBuilding',
 
   components: {
-    AddNewMenuItem,
-    LevelMenuItem,
+    Map,
+    // AddNewMenuItem,
+    // LevelMenuItem,
     NewPathPointsModal,
     ConfirmRemoveModal,
     EditPathPointsModal
@@ -71,6 +92,8 @@ export default {
       pathPoints: [],
       isModalVisible: false,
       selectedPoint: {},
+      currentLevel: '1',
+      locations: [],
     };
   },
 
@@ -165,5 +188,8 @@ export default {
 </script>
 
 <style>
-
+.page-header {
+  display: flex;
+  justify-content: center;
+}
 </style>
