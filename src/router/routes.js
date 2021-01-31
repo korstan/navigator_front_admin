@@ -23,7 +23,7 @@ export default [
     path: '/paths/:id',
     component: PathsBuilding,
     props(route) {
-      return { title: route.query.title };
+      return { title: route.query.title, buildingId: route.params.id };
     },
   },
   { path: '/foo', component: HelloWorld },

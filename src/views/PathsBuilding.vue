@@ -12,25 +12,15 @@
         </option>
       </b-select>
     </div>
-    
-<!--    <b-menu :activable="false">-->
-<!--      <b-menu-list v-if="!isLoading">-->
-<!--        <LevelMenuItem-->
-<!--          v-for="pathPoint in pathPoints"-->
-<!--          :key="pathPoint.id"-->
-<!--          :locations="pathPoint.points"-->
-<!--          :level="pathPoint.level"-->
-<!--          @edit="onEdit"-->
-<!--          @remove="onRemove"-->
-<!--        />-->
-<!--        <AddNewMenuItem label="маршрутную точку" @click="showModal('new')" />-->
-<!--      </b-menu-list>-->
-<!--    </b-menu>-->
+
+    <b-checkbox v-model="locationsVisible" type="is-info" class="is-pulled-left mb-3">
+      Показать существующие локации
+    </b-checkbox>
     <Map
-        :locationsVisible="this.locationsVisible"
-        :building-id="this.buildingId"
+        :locationsVisible="locationsVisible"
+        :building-id="buildingId"
         :lev="currentLevel"
-        :locs="pathPoints"
+        :locs="locs"
         @new="showNewModal"
         @edit="onEdit"
         @remove="onRemove"
@@ -59,8 +49,6 @@
 </template>
 
 <script>
-// import AddNewMenuItem from '@/components/AddNewMenuItem';
-// import LevelMenuItem from '@/components/BuildingInfo/LevelMenuItem';
 import NewPathPointsModal from '@/components/PathsBuilding/NewPathPointsModal';
 import ConfirmRemoveModal from '@/components/ConfirmRemoveModal';
 import EditPathPointsModal from '@/components/PathsBuilding/EditPathPointsModal';
@@ -74,8 +62,6 @@ export default {
 
   components: {
     Map,
-    // AddNewMenuItem,
-    // LevelMenuItem,
     NewPathPointsModal,
     ConfirmRemoveModal,
     EditPathPointsModal
@@ -83,6 +69,7 @@ export default {
 
   props: {
     title: String,
+    buildingId: String
   },
 
   data() {
@@ -93,7 +80,7 @@ export default {
       isModalVisible: false,
       selectedPoint: {},
       currentLevel: '1',
-      locations: [],
+      locationsVisible: false
     };
   },
 
@@ -124,6 +111,10 @@ export default {
         textToSpeech: foundPoint.textToSpeech,
         isStairs: foundPoint.isStairs,
       }
+    },
+    showNewModal: function(newLocationPoints) {
+      this.visibleModal = 'new';
+      this.newLocationPoints = newLocationPoints;
     },
     onEdit(obj) {
       this.setSelectedPoint(obj);
@@ -182,6 +173,11 @@ export default {
           .map(l => ({...l, points: l.points.filter(loc => loc.id != response.id) }));
         this.hideModal();
       }
+    },
+  },
+  computed: {
+    locs: function () {
+      return this.pathPoints.find(l=>l.level === this.currentLevel).points;
     },
   },
 }
