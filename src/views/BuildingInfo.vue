@@ -64,6 +64,8 @@
 </template>
 
 <script>
+// import AddNewMenuItem from '@/components/AddNewMenuItem';
+// import LevelMenuItem from '@/components/BuildingInfo/LevelMenuItem';
 import NewLocationModal from '@/components/BuildingInfo/NewLocationModal';
 import ConfirmRemoveModal from '@/components/ConfirmRemoveModal';
 import EditLocationModal from '@/components/BuildingInfo/EditLocationModal';
@@ -77,6 +79,8 @@ export default {
   name: 'BuildingInfo',
   components: {
     Map,
+    // AddNewMenuItem, 
+    // LevelMenuItem, 
     NewLocationModal,
     ConfirmRemoveModal,
     EditLocationModal
