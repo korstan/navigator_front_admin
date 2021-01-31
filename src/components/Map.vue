@@ -40,7 +40,8 @@ export default {
     buildingId: String,
     lev: String,
     locationsVisible: Boolean,
-    locs: Array
+    locs: Array,
+    edges: Array
   },
   data() {
     return {
@@ -56,6 +57,7 @@ export default {
       currentMarkersObjects: [],
       locMarkers: [],
       newMarkerObject: undefined,
+      polylineObject: null,
 
       newModalVisible: false,
       newModalX: 0,
@@ -102,25 +104,6 @@ export default {
       return [ parseInt(x) * leafletDivider / this.sizeMultiplier, 
         parseInt(y) * leafletDivider  / this.sizeMultiplier * -1];
     },
-    convertLatLngToPercents(lat, lng) {
-      const clickWidth = lng;
-      const clickHeight = lat * -1;
-
-      const leafletMapWidth = this.mapWidth / this.leafletDivider;
-      const leafletMapHeight = this.mapHeight / this.leafletDivider;
-      return {
-        percentByWidth: parseFloat((clickWidth / leafletMapWidth).toFixed(4)),
-        percentByHeight: parseFloat((clickHeight / leafletMapHeight).toFixed(4))
-      }
-    },
-    convertPercentsToLatLng(percentByWidth, percentByHeight) {
-      const leafletMapWidth = this.mapWidth / this.leafletDivider;
-      const leafletMapHeight = this.mapHeight / this.leafletDivider;
-      return {
-        lng: parseFloat((leafletMapWidth * percentByWidth).toFixed(4)),
-        lat: parseFloat((leafletMapHeight * percentByHeight * -1).toFixed(4))
-      }
-    },
     addNewMarker(leafletPoint) {
       const marker = L.marker(leafletPoint, {icon: DefaultIcon})
       marker.addTo(this.map);
@@ -137,7 +120,7 @@ export default {
       const leafletPoint = this.convertPixelToLeafletPoint(loc.x, loc.y);
       const marker = L.marker(leafletPoint, {icon: SecondaryIcon});
       marker.addTo(this.map);
-      this.hideAllMarkerModals();
+
       marker.on('click',(e)=> {
         this.editModalVisible = !this.editModalVisible;
         this.editModalX = e.originalEvent.pageX;
@@ -154,6 +137,7 @@ export default {
       this.locMarkers = []
     },
     updateMarkers() {
+      this.hideAllMarkerModals()
       this.removeAllMarkers()
       if (this.locs && this.locs.length > 0) {
         for (const loc of this.locs) {
@@ -176,7 +160,24 @@ export default {
     },
     emitRemoveLocation() {
       this.$emit('remove', this.editModalTargetLocId);
-    }
+    },
+    addPolyline(leafletPoints) {
+      this.polylineObject = L.polyline(leafletPoints, {color: 'green'})
+      this.polylineObject.addTo(this.map)
+    },
+    removePolyline() {
+      if (this.polylineObject) {
+        this.polylineObject.remove(this.map)
+        this.polylineObject = null;
+      }
+    },
+    updatePolyline() {
+      this.removePolyline()
+      if (this.edges && this.edges.length > 0) {
+        const leafletPoints = this.edges.map(edge => edge.map(pixelPoint =>  this.convertPixelToLeafletPoint(pixelPoint.x, pixelPoint.y)))
+        this.addPolyline(leafletPoints)
+      }
+    },
   },
   mounted() {
     this.map = L.map('map', {
@@ -189,33 +190,37 @@ export default {
     });
     this.$refs['map'].style.height = Math.round(window.innerHeight * 0.75) - 50 + 'px';
 
-
     this.map.on('click', (e) => {
       this.addNewMarker([e.latlng.lat, e.latlng.lng])
-      // console.log(e.latlng)
-      // const pixels = this.convertLeafletPointToPixels(e.latlng.lng, e.latlng.lat)
-      // console.log(pixels);
-      // console.log(this.convertPixelToLeafletPoint(percents.percentByWidth, percents.percentByHeight))
     });
-    
-    this.map.on('movestart', (e) => { this.hideAllMarkerModals() });
+    this.map.on('movestart', () => { this.hideAllMarkerModals() });
     this.updateMapImage();
+    this.map.invalidateSize();
   },
   watch: {
     locs: function () {
-      this.updateMapImage();
-      this.locationsVisible && this.updateMarkers();
+      if (this.locationsVisible)
+        this.updateMarkers();
     },
     lev: function () {
       this.updateMapImage();
       this.removeAllMarkers();
       this.hideAllMarkerModals();
-      this.locationsVisible && this.updateMarkers();
+      if (this.locationsVisible)
+        this.updateMarkers();
     },
     locationsVisible: function() {
-      this.locationsVisible ?
-        this.updateMarkers():
+      if (this.locationsVisible) {
+        this.updateMarkers();
+        this.updatePolyline();
+      } else {
         this.removeAllMarkers();
+        this.removePolyline();
+      }
+    },
+    edges: function () {
+      if (this.locationsVisible)
+        this.updatePolyline()
     }
   }
 }

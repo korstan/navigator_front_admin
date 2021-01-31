@@ -14,13 +14,14 @@
     </div>
 
     <b-checkbox v-model="locationsVisible" type="is-info" class="is-pulled-left mb-3">
-      Показать существующие локации
+      Показать существующий граф
     </b-checkbox>
     <Map
         :locationsVisible="locationsVisible"
         :building-id="buildingId"
         :lev="currentLevel"
         :locs="locs"
+        :edges="edges"
         @new="showNewModal"
         @edit="onEdit"
         @remove="onRemove"
@@ -182,6 +183,20 @@ export default {
     locs: function () {
       const pointsOfCurrentLevel = this.pathPoints.find(l=>l.level === this.currentLevel);
       return pointsOfCurrentLevel ? pointsOfCurrentLevel.points : [];
+    },
+    edges: function () {
+      const pointsOfCurrentLevel = this.pathPoints.find(l=>l.level === this.currentLevel);
+      return pointsOfCurrentLevel ? pointsOfCurrentLevel.points.map(point => {
+        if (!point.links || point.links.length === 0)
+          return [];
+
+        const startPoint = {x:point.x, y:point.y}
+        return point.links.map(linkPointId => {
+          const linkPoint = pointsOfCurrentLevel.points.find(point => point.id === linkPointId)
+
+          return linkPoint ? [startPoint, {x:linkPoint.x, y:linkPoint.y}] : [];
+        })
+      }).flat() : [];
     },
   },
 }
