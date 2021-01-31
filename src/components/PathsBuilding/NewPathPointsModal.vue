@@ -50,7 +50,7 @@
 
 <script>
 export default {
-  props: ['visible'],
+  props: ['visible', 'initialX', 'initialY',],
   data() {
     return {
       title: '',
@@ -86,6 +86,10 @@ export default {
       this.resetForm();
     },
   },
+  updated() {
+    this.x = this.initialX;
+    this.y = this.initialY;
+  }
 };
 </script>
 

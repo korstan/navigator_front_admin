@@ -28,6 +28,8 @@
 
     <NewPathPointsModal
       :visible="visibleModal === 'new'"
+      :initial-x="newPathPoint.x"
+      :initial-y="newPathPoint.y"
       @close="hideModal"
       @submit="submitNewPoint"
     />
@@ -79,6 +81,7 @@ export default {
       pathPoints: [],
       isModalVisible: false,
       selectedPoint: {},
+      newPathPoint: {},
       currentLevel: '1',
       locationsVisible: false
     };
@@ -112,16 +115,16 @@ export default {
         isStairs: foundPoint.isStairs,
       }
     },
-    showNewModal: function(newLocationPoints) {
+    showNewModal: function(newPathPoint) {
       this.visibleModal = 'new';
-      this.newLocationPoints = newLocationPoints;
+      this.newPathPoint = newPathPoint;
     },
-    onEdit(obj) {
-      this.setSelectedPoint(obj);
+    onEdit(id) {
+      this.setSelectedPoint({id, level: this.currentLevel});
       this.showModal('edit');
     },
-    onRemove(obj) {
-      this.setSelectedPoint(obj);
+    onRemove(id) {
+      this.setSelectedPoint({id, level: this.currentLevel});
       this.showModal('remove');
     },
     submitNewPoint: async function(newPoint) {
@@ -177,7 +180,8 @@ export default {
   },
   computed: {
     locs: function () {
-      return this.pathPoints.find(l=>l.level === this.currentLevel).points;
+      const pointsOfCurrentLevel = this.pathPoints.find(l=>l.level === this.currentLevel);
+      return pointsOfCurrentLevel ? pointsOfCurrentLevel.points : [];
     },
   },
 }
