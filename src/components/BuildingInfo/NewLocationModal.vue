@@ -12,7 +12,7 @@
         </b-field>
 
         <b-field label="Этаж">
-          <b-input v-model="level" placeholder="Номер этажа" required>
+          <b-input v-model="level" placeholder="Номер этажа" required disabled>
           </b-input>
         </b-field>
 
@@ -53,7 +53,6 @@ export default {
   data() {
     return {
       title: '',
-      level: this.currentLevel,
       x: 0,
       y: 0,
       x_entry: null,
@@ -67,10 +66,9 @@ export default {
     },
     resetForm: function() {
       this.title = '';
-      this.level = this.currentLevel;
       this.x = 0;
       this.y = 0;
-      this.x_entry = null,
+      this.x_entry = null;
       this.y_entry = null
     },
     submit: function() {
@@ -85,16 +83,18 @@ export default {
       this.resetForm();
     },
   },
-  updated() {
-    if (this.x === 0)
-      this.x = this.initialX;
-    if (this.y === 0)
-      this.y = this.initialY;
+  computed: {
+    level: function (){
+      return this.currentLevel;
+    }
   },
   watch: {
-    currentLevel: function () {
-      this.level = this.currentLevel;
-    }
+    initialX(val) {
+      this.x = val;
+    },
+    initialY(val) {
+      this.y = val;
+    },
   },
 };
 </script>

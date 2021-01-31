@@ -31,6 +31,7 @@
       :visible="visibleModal === 'new'"
       :initial-x="newPathPoint.x"
       :initial-y="newPathPoint.y"
+      :currentLevel="currentLevel"
       @close="hideModal"
       @submit="submitNewPoint"
     />
