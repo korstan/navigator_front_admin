@@ -31,13 +31,17 @@
       :locationsVisible="this.locationsVisible" 
       :building-id="this.buildingId" 
       :lev="currentLevel"
+      :locs="locs"
       @new="showNewModal"
+      @edit="onEdit"
+      @remove="onRemove"
     ></Map>
 
     <NewLocationModal
       :visible="visibleModal === 'new'"
       :x="newLocationPoints.x"
       :y="newLocationPoints.y"
+      :currentLevel="currentLevel"
       @close="hideModal"
       @submit="submitNewLocation"
     />
@@ -97,6 +101,11 @@ export default {
       locationsVisible: false
     };
   },
+  computed: {
+    locs: function () {
+      return this.locations.find(l=>l.level === this.currentLevel).locations.map(l=>({...l, x: l.points.x1, y: l.points.y1}));
+    },
+  },
   methods: {
     showModal: function (modalName) {
       this.visibleModal = modalName;
@@ -124,12 +133,12 @@ export default {
         pathPointId: foundLocation.pathPointId,
       }
     },
-    onEdit(obj) {
-      this.setSelectedLocation(obj);
+    onEdit(id) {
+      this.setSelectedLocation({id, level: this.currentLevel});
       this.showModal('edit');
     },
-    onRemove(obj) {
-      this.setSelectedLocation(obj);
+    onRemove(id) {
+      this.setSelectedLocation({id, level: this.currentLevel});
       this.showModal('remove');
     },
     submitNewLocation: async function(newLocation) {

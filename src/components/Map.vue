@@ -6,8 +6,8 @@
     <b-button @click="emitNewLocation" type="is-text">Создать новую локацию</b-button>
   </MarkerPopup>
   <MarkerPopup :visible="this.editModalVisible" :x="this.editModalX" :y="this.editModalY">
-    <b-button type="is-text">Редактировать</b-button>
-    <b-button type="is-text">Удалить</b-button>
+    <b-button @click="emitEditLocation" type="is-text">Редактировать</b-button>
+    <b-button @click="emitRemoveLocation" type="is-text">Удалить</b-button>
   </MarkerPopup>
 </div>
 </template>
@@ -16,6 +16,7 @@
 import L from 'leaflet/dist/leaflet';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
+import secondaryIcon from '@/assets/marker-icon-secondary.png';
 import MarkerPopup from '@/components/MarkerPopup';
 
 let DefaultIcon = L.icon({
@@ -24,7 +25,13 @@ let DefaultIcon = L.icon({
   iconAnchor: [12, 36]
 });
 
-L.Marker.prototype.options.icon = DefaultIcon;
+let SecondaryIcon = L.icon({
+  iconUrl: secondaryIcon,
+  iconSize: [24, 36],
+  iconAnchor: [12, 36]
+})
+
+// L.Marker.prototype.options.icon = DefaultIcon;
 
 export default {
   name: 'Map',
@@ -33,6 +40,7 @@ export default {
     buildingId: String,
     lev: String,
     locationsVisible: Boolean,
+    locs: Array
   },
   data() {
     return {
@@ -43,10 +51,10 @@ export default {
       leafletDivider: 8,
 
       levels: null,
-      currentLevelObject: null,
       sizeMultiplier: 5,
 
       currentMarkersObjects: [],
+      locMarkers: [],
       newMarkerObject: undefined,
 
       newModalVisible: false,
@@ -56,6 +64,7 @@ export default {
       editModalVisible: false,
       editModalX: 0,
       editModalY: 0,
+      editModalTargetLocId: undefined
     }
   },
   methods: {
@@ -80,11 +89,6 @@ export default {
         this.map.setMaxBounds(bounds);
       }
       img.src = require('../assets/' + this.buildingId + '/' + this.lev + '.svg');
-    },
-    setLevel(level) {
-      if (this.currentLevelObject !== level) {
-        this.currentLevelObject = level;
-      }
     },
     convertPixelToLeafletPoint(x, y) {
       const leafletDivider = 8;
@@ -118,7 +122,7 @@ export default {
       }
     },
     addNewMarker(leafletPoint) {
-      const marker = L.marker(leafletPoint, DefaultIcon)
+      const marker = L.marker(leafletPoint, {icon: DefaultIcon})
       marker.addTo(this.map);
       this.newModalVisible = false;
       marker.on('click',(e)=> {
@@ -129,23 +133,31 @@ export default {
       this.newMarkerObject && this.newMarkerObject.remove();
       this.newMarkerObject = marker;
     },
-    addExistingMarker(leafletPoint) {
-      const marker = L.marker(leafletPoint, DefaultIcon)
-      marker.addTo(this.map)
-      this.currentMarkersObjects.push(marker)
+    addLocMarker(loc) {
+      const leafletPoint = this.convertPixelToLeafletPoint(loc.x, loc.y);
+      const marker = L.marker(leafletPoint, {icon: SecondaryIcon});
+      marker.addTo(this.map);
+      this.hideAllMarkerModals();
+      marker.on('click',(e)=> {
+        this.editModalVisible = !this.editModalVisible;
+        this.editModalX = e.originalEvent.pageX;
+        this.editModalY = e.originalEvent.pageY;
+        this.editModalTargetLocId = loc.id;
+      });
+      this.locMarkers.push({loc, marker})
     },
     removeAllMarkers() {
       this.newMarkerObject && this.newMarkerObject.remove();
-      for (const marker of this.currentMarkersObjects) {
+      for (const {marker} of this.locMarkers) {
         marker.remove(this.map)
       }
-      this.currentMarkersObjects = []
+      this.locMarkers = []
     },
     updateMarkers() {
       this.removeAllMarkers()
-      if (this.currentLevelObject.markersPoints && this.currentLevelObject.markersPoints.length > 0) {
-        for (const markerPoint of this.currentLevelObject.markersPoints) {
-          this.addMarker(markerPoint)
+      if (this.locs && this.locs.length > 0) {
+        for (const loc of this.locs) {
+          this.addLocMarker(loc)
         }
       }
     },
@@ -158,20 +170,12 @@ export default {
       const { lat, lng } = this.newMarkerObject.getLatLng();
       const [x, y] = (this.convertLeafletPointToPixels(lng, lat));
       this.$emit('new', {x, y});
-    }
-  },
-  async created() {
-    const apiUrl = 'http://194.87.232.192/navigator/api/';
-    const response = await fetch(apiUrl + 'level?buildingId=' + this.buildingId);
-    if (response.ok) {
-      this.levels = await response.json();
-
-      const firstLevel = this.levels.find(level => level.level === "1");
-      if (!firstLevel)
-        alert('first level not found');
-      this.setLevel(firstLevel)
-    } else {
-      alert("error: " + response.status);
+    },
+    emitEditLocation() {
+      this.$emit('edit', this.editModalTargetLocId);
+    },
+    emitRemoveLocation() {
+      this.$emit('remove', this.editModalTargetLocId);
     }
   },
   mounted() {
@@ -193,23 +197,25 @@ export default {
       // console.log(pixels);
       // console.log(this.convertPixelToLeafletPoint(percents.percentByWidth, percents.percentByHeight))
     });
-
+    
     this.map.on('movestart', (e) => { this.hideAllMarkerModals() });
-  },
-  computed: {
-    level: function () {
-      return this.currentLevelObject ? this.currentLevelObject.level : 1;
-    },
+    this.updateMapImage();
   },
   watch: {
-    currentLevelObject: function () {
+    locs: function () {
       this.updateMapImage();
-      this.updateMarkers();
+      this.locationsVisible && this.updateMarkers();
     },
     lev: function () {
       this.updateMapImage();
       this.removeAllMarkers();
       this.hideAllMarkerModals();
+      this.locationsVisible && this.updateMarkers();
+    },
+    locationsVisible: function() {
+      this.locationsVisible ?
+        this.updateMarkers():
+        this.removeAllMarkers();
     }
   }
 }

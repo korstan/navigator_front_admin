@@ -49,11 +49,11 @@
 
 <script>
 export default {
-  props: ['visible', 'x', 'y'],
+  props: ['visible', 'x', 'y', 'currentLevel'],
   data() {
     return {
       title: '',
-      level: 1,
+      level: this.currentLevel,
       x: this.x || 0,
       y: this.y || 0,
       x_entry: null,
@@ -67,7 +67,7 @@ export default {
     },
     resetForm: function() {
       this.title = '';
-      this.level = 1;
+      this.level = this.currentLevel;
       this.x = 0;
       this.y = 0;
       this.x_entry = null,
@@ -84,6 +84,11 @@ export default {
       });
       this.resetForm();
     },
+  },
+  watch: {
+    currentLevel: function () {
+      this.level = this.currentLevel;
+    }
   },
 };
 </script>
