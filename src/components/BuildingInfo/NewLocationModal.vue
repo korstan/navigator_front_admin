@@ -75,8 +75,8 @@ export default {
       this.$emit('submit', {
         title: this.title,
         level: this.level,
-        x: this.x,
-        y: this.y,
+        x: parseFloat(this.x),
+        y: parseFloat(this.y),
         x_entry: this.x_entry,
         y_entry: this.y_entry,
       });
