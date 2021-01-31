@@ -87,8 +87,10 @@ export default {
     },
   },
   updated() {
-    this.x = this.initialX;
-    this.y = this.initialY;
+    if (this.x === 0)
+      this.x = this.initialX;
+    if (this.y === 0)
+      this.y = this.initialY;
   }
 };
 </script>

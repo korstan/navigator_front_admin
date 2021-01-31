@@ -39,8 +39,8 @@
 
     <NewLocationModal
       :visible="visibleModal === 'new'"
-      :x="newLocationPoints.x"
-      :y="newLocationPoints.y"
+      :initialX="newLocationPoints.x"
+      :initialY="newLocationPoints.y"
       :currentLevel="currentLevel"
       @close="hideModal"
       @submit="submitNewLocation"
@@ -99,7 +99,8 @@ export default {
   },
   computed: {
     locs: function () {
-      return this.locations.find(l=>l.level === this.currentLevel).locations.map(l=>({...l, x: l.points.x1, y: l.points.y1}));
+      const currentLocation = this.locations.find(l=>l.level === this.currentLevel);
+      return currentLocation ? currentLocation.locations.map(l=>({...l, x: l.points.x1, y: l.points.y1})) : [];
     },
   },
   methods: {
